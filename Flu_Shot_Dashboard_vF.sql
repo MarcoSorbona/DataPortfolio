@@ -1,3 +1,13 @@
+/*
+Objective:
+Retrieve data on patients who received the flu shot in 2022.
+*/
+
+/*
+The first CTE filters active patients based on encounters and patient data. 
+It selects distinct patients who were active at the hospital between January 1, 2020, and December 31, 2022. 
+Active patients are those with no death recorded and whose age is 6 months or older as of December 31, 2022. 
+*/
 with active_patients as
 (
 	select 
@@ -11,6 +21,10 @@ with active_patients as
 		and EXTRACT(EPOCH FROM age('2022-12-31',pat.birthdate)) / 2592000 >= 6
 ),
 
+/*
+The second CTE filters immunizations to identify flu shots administered in 2022. 
+It selects the earliest flu shot date for each patient who received the flu shot with the specified code during 2022.
+*/
 flu_shot_2022 as 
 (
 	select 
@@ -22,6 +36,12 @@ flu_shot_2022 as
 	group by patient
 )
 
+/*
+The main query joins patient data with the flu_shot_2022 CTE to generate the desired dataset. 
+It selects patient attributes such as birthdate, race, county, state, ID, first name, and last name. 
+It also includes whether the patient received a flu shot in 2022 (1 for yes, 0 for no), 
+the age of the patient as of December 31, 2022, and the earliest flu shot date for those who received it.
+*/
 select 
 	 pat.birthdate
 	,pat.race
